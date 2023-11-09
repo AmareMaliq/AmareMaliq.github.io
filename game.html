@@ -1,3 +1,8 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<!-- Autoplay is allowed. -->
+
 <style>
   body {
     margin: 0;
@@ -6,11 +11,128 @@
     align-items: center;
     background-color: black;
   }
+  #restartButton {
+    display: none; /* Initially hidden */
+    background-color: #4caf50; /* Green background color */
+    justify-content: center;
+    text-align: center;
+
+    color: white; /* White text color */
+    padding: 10px 20px; /* Padding around the text */
+    margin: 50px 20px;
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Cursor style on hover */
+    font-size: 16px; /* Font size */
+  }
+
+  #restartButton:hover {
+    background-color: #45a049; /* Darker green background on hover */
+  }
+
+  #playButton {
+    background-color: #4caf50;
+    color: white; /* White text color */
+    padding: 10px 20px; /* Padding around the text */
+    margin: 50px 20px;
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Cursor style on hover */
+    font-size: 16px; /* Font size */
+  }
+  .control-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #4caf50;
+    color: white;
+    font-size: 16px;
+    margin: 10px;
+    border: none;
+    cursor: pointer;
+   
+  }
+
+  @media screen and (max-width: 768px) {
+    h1 {
+      font-size: 24px;
+    }
+  }
 </style>
 
-<div style="position: relative">
-  <p style="position: absolute; z-index: 10; color: white; left: 10px; top: 10px; margin: 0; font-family: sans-serif; font-size: 14px"><span>Score:</span> <span id="scoreEl">0</span></p>
-  <canvas></canvas>
-</div>
+<script src="https://cdn.tailwindcss.com"></script>
+<body>
+  <audio id="myAudio" loop>
+    <source src="img/Space Shooter Template Music.mp3" type="audio/mpeg" />
+  </audio>
+ 
+  <div style="position: relative">
+    <div class="fixed inset-0 flex items-center justify-center" id="modal">
+      <!-- username input -->
+      <div class="">
+        <form id="usernameForm" class="flex flex-col justify-center items-center gap-4 bg-white max-w-md w-full p-6 rounded-md text-center px-40">
+          <div>
+            <input id="usernameInput" type="text" placeholder="Username" style="padding: 12px; margin-top: -50px; border-radius: 20px; border: none; background: #475569; color: #cbd5e1" />
+          </div>
+          <!-- username input end -->
+          <h1 class="text-4xl font-bold leading-none" id="LastScore">0</h1>
+          <p class="text-sm text-gray-700 mb-4">Points</p>
+          <div>
+            <button type="submit" class="bg-blue-500 rounded-full text-white w-full py-2 px-4 text-sm" id="startGameBtn">Start Game</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <p style="position: absolute; z-index: 10; color: white; left: 10px; top: 10px; margin: 0; font-family: sans-serif; font-size: 14px"><span>Score:</span> <span id="scoreEl">0</span></p>
+    <p style="position: absolute; z-index: 10; color: white; left: 10px; top: 10px; margin: 0; font-family: sans-serif; font-size: 14px; margin-top: 15px"><span>Name:</span> <span id="username""></span></p>
+
+    <button id="restartButton" style="display: none">Restart Game</button>
+    <canvas></canvas>
+    <div style="position: relative">
+      <button id="moveLeftButton" class="control-button" onmousedown="startMovingLeft()" onmouseup="stopMovingLeft()" style="position: absolute; left: 10px; bottom: 10px;"><i class="fa-solid fa-arrow-left"></i></button>
+      <button id="moveRightButton" class="control-button" onmousedown="startMovingRight()" onmouseup="stopMovingRight()" style="position: absolute; right: 10px; bottom: 10px;"><i class="fa-solid fa-arrow-right"></i></button>
+      <button id="shootButton" class="control-button" onclick="shoot()" style="position: absolute; right: 72px; bottom: 10px;"><i class="fas fa-crosshairs"></i></button>
+  </div>
+  
+    
+   
+   
+  </div>
+</body>
 
 <script src="./index.js"></script>
+<script>
+  var audio = document.getElementById("myAudio");
+  var playButton = document.getElementById("playButton");
+  var restartButton = document.getElementById("restartButton");
+
+  // Check the audio state when the page loads
+  if (localStorage.getItem("audioState") === "playing") {
+    audio.play();
+    playButton.textContent = "Play Music";
+  }
+
+  restartButton.addEventListener("click", function () {
+    // Stop the audio and reload it to start from the beginning
+
+    audio.play();
+
+    // Update the playButton state and localStorage
+    playButton.textContent = "Pause Music";
+    localStorage.setItem("audioState", "paused");
+  });
+
+  playButton.addEventListener("click", function () {
+    if (audio.paused) {
+      audio.play();
+      playButton.textContent = "Pause Music";
+      localStorage.setItem("audioState", "playing"); // Store the state
+    } else {
+      audio.pause();
+      playButton.textContent = "Play Music";
+      localStorage.setItem("audioState", "paused"); // Store the state
+    }
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+
