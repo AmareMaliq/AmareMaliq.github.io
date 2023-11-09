@@ -1,11 +1,40 @@
 const scoreEl = document.querySelector("#scoreEl");
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
-
+const startGameBtn = document.querySelector("#startGameBtn");
 console.log(scoreEl);
+const username = document.getElementById("username");
+const valueUsername = document.getElementById("usernameInput");
+const usernameForm = document.getElementById("usernameForm");
+const moveLeftButton = document.getElementById("moveLeftButton");
+const moveRightButton = document.getElementById("moveRightButton");
+
+const modal = document.querySelector("#modal");
+const shootButton = document.getElementById("shootButton");
+
+// Tambahkan event listener untuk mengatasi pengiriman formulir
+usernameForm.addEventListener("submit", function (e) {
+  e.preventDefault(); // Mencegah tindakan bawaan pengiriman formulir
+
+  // Setel nilai elemen #username dengan nilai input
+  username.innerHTML = valueUsername.value;
+});
 
 canvas.width = 1024;
 canvas.height = 576;
+
+// var music = {
+//   overworld: new Howl({
+//     src: ["img/Space Shooter Template Music.mp3"],
+//     autoplay: true,
+//   }),
+// };
+
+// function PlayMusic() {
+//   let music = document.getElementById("music");
+
+//   music.play();
+// }
 
 class Player {
   constructor() {
@@ -337,8 +366,19 @@ function animate() {
       }, 0);
 
       setTimeout(() => {
+        if (game.over) {
+          restartButton.style.display = "block"; // Show the restart button
+          audio.pause(); // Pause the audio when the game is over
+        } else {
+          restartButton.style.display = "none"; // Hide the restart button when the game is not over
+        }
+
+        // Add an event listener for the restart button (already included in the HTML code):
+        restartButton.addEventListener("click", function () {
+          location.reload(); // Reload the page to restart the game
+        });
         c.font = "20px sans-serif";
-        c.fillText("Game Over : Press Space to Restart", 300, 400);
+        c.fillText("Game Over : Press The Button To Restart", 300, 400);
         game.active = false;
       }, 3000);
 
@@ -435,6 +475,69 @@ function animate() {
 }
 
 animate();
+startGameBtn.addEventListener("click", () => {
+  modal.style.display = "none";
+  audio.play();
+});
+
+let moveLeftPressed = false;
+let moveRightPressed = false;
+
+function startMovingLeft() {
+  moveLeftPressed = true;
+  movePlayer();
+}
+
+function stopMovingLeft() {
+  moveLeftPressed = false;
+  stopPlayer();
+}
+
+function startMovingRight() {
+  moveRightPressed = true;
+  movePlayer();
+}
+
+function stopMovingRight() {
+  moveRightPressed = false;
+  stopPlayer();
+}
+
+function shoot() {
+  projectiles.push(
+    new Projectile({
+      position: {
+        x: player.position.x + player.width / 2,
+        y: player.position.y,
+      },
+      velocity: {
+        x: 0,
+        y: -15,
+      },
+    })
+  );
+
+  console.log(projectiles);
+}
+
+shootButton.addEventListener("click", shoot);
+
+function movePlayer() {
+  if (moveLeftPressed) {
+    player.velocity.x = -10;
+    player.rotation = -0.15;
+  } else if (moveRightPressed) {
+    player.velocity.x = 10;
+    player.rotation = 0.15;
+  }
+}
+
+function stopPlayer() {
+  if (!moveLeftPressed && !moveRightPressed) {
+    player.velocity.x = 0;
+    player.rotation = 0;
+  }
+}
 
 addEventListener("keydown", ({ key }) => {
   if (game.over) return;
